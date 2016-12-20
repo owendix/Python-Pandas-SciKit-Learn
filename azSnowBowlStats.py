@@ -187,6 +187,7 @@ def snowHazard(snwCondStr):
     
     w4=['spring','summ','ice','hard','icy']
     w3='groom'
+    w2=['vary','variable']
     w1='pack'
     wavg = 'and'
     
@@ -198,6 +199,9 @@ def snowHazard(snwCondStr):
     
     if w3 in s:
         h = np.append(h,4)
+    for w in w2:
+        if w in s:
+            h = np.append(h,3)
     if w1 in s:
         h = np.append(h,2)
     if wavg in s:
@@ -206,7 +210,7 @@ def snowHazard(snwCondStr):
     elif len(h) == 0:
         h = np.append(h,0)
     
-    return int(h.mean())
+    return int(round(h.mean()))
 
 
 
@@ -283,7 +287,7 @@ def getMoreWeather(is_forecast=False):
     try:
         print('Retrieving data from '+site)
         resp = requests.get(site)
-        soup = BeautifulSoup(resp.content)
+        soup = BeautifulSoup(resp.content, "lxml")
         assert soup is not None
     except AssertionError:
         print('No data retrieved from '+site)
@@ -362,7 +366,7 @@ def getMoreWeather(is_forecast=False):
                         #p(d+n) = 1 - (1-p(d))(1-p(n)), where p:[0-1]
                         poptotal = 100*(1 - (1-0.01*pops[0])*(1-0.01*pops[1]))
                         
-                    return [temps[1],temps[0],poptotal]
+                    return [temps[1],temps[0],round(poptotal)]
 
         list_i = list_i.next_sibling
         
@@ -397,7 +401,7 @@ def getConditions():
     try:
         print('Retrieving data from '+site)
         resp = requests.get(site)
-        soup = BeautifulSoup(resp.content)
+        soup = BeautifulSoup(resp.content, "lxml")
         assert soup is not None
     except AssertionError:
         print('No data retrieved from '+site)
@@ -517,7 +521,7 @@ def getLiftsTrails():
     try:        
         print('Retrieving data from '+site)
         resp = requests.get(site)
-        soup = BeautifulSoup(resp.content)
+        soup = BeautifulSoup(resp.content, "lxml")
         assert soup is not None
     except AssertionError:
         print('No data retrieved from '+site)
@@ -892,7 +896,7 @@ def plotStats(df, subplots=True, text=None):
     else:
         fig, axes = plt.subplots(nrows=4,ncols=2,figsize=(11,8.5))
 
-        axes[0][0].set_ylabel('Inches')
+        axes[0][0].set_ylabel('%, Inches')
         axes[1][0].set_ylabel('Hazard Level')
         axes[2][0].set_ylabel('Number')
         #plt.rc('text',usetex=True)        
